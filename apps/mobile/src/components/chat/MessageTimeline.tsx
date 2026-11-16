@@ -1,3 +1,5 @@
+import { useTheme } from "@/hooks/use-theme";
+import { t } from "../../i18n";
 import type { ChatMessage } from "codex-relay/api-schema";
 import {
   type LegendListRef,
@@ -21,7 +23,7 @@ import { useSafeAreaInsets } from "react-native-safe-area-context";
 
 import { ThemedText } from "@/components/themed-text";
 import { Icon } from "@/components/ui/icon";
-import { Colors, Spacing } from "@/constants/theme";
+import { Spacing } from "@/constants/theme";
 import { hapticSelection } from "@/lib/haptics";
 
 import { MessageBubble } from "./MessageBubble";
@@ -74,6 +76,7 @@ export function MessageTimeline({
   onOpenMarkdownAttachment?: (target: WorkspaceMarkdownPreviewTarget) => void;
   threadId?: string;
 }) {
+  const theme = useTheme();
   const listRef = useRef<LegendListRef | null>(null);
   const removeAtEndListenerRef = useRef<(() => void) | null>(null);
   const { bottom } = useSafeAreaInsets();
@@ -178,7 +181,7 @@ export function MessageTimeline({
           <Animated.View style={[styles.transitionScene, timelineContentStyle]}>
             <View style={styles.empty}>
               <ThemedText type="small" themeColor="textSecondary" style={styles.emptyText}>
-                Send a message to start the conversation.
+                {t("Send a message to start the conversation.")}
               </ThemedText>
             </View>
           </Animated.View>
@@ -226,13 +229,13 @@ export function MessageTimeline({
           style={styles.scrollToEndContainer}
         >
           <Pressable
-            accessibilityLabel="Scroll to latest message"
+            accessibilityLabel={t("Scroll to latest message")}
             accessibilityRole="button"
             hitSlop={8}
             onPress={handleScrollToEnd}
             style={({ pressed }) => [styles.scrollToEndButton, pressed && styles.pressed]}
           >
-            <Icon name="expand" size={18} tintColor={Colors.dark.text} />
+            <Icon name="expand" size={18} tintColor={theme.text} />
           </Pressable>
         </Animated.View>
       ) : null}
@@ -251,17 +254,18 @@ export function MessageTimeline({
 }
 
 function LoadingConversation() {
+  const theme = useTheme();
   return (
     <View style={styles.empty} accessibilityRole="progressbar">
-      <ActivityIndicator color={Colors.dark.textSecondary} />
+      <ActivityIndicator color={theme.textSecondary} />
       <ThemedText type="small" themeColor="textSecondary" style={styles.emptyText}>
-        Loading conversation…
+        {t("Loading conversation…")}
       </ThemedText>
     </View>
   );
 }
 
-const styles = StyleSheet.create({
+const styles = StyleSheet.create((theme) => ({
   content: {
     paddingBottom: Spacing.two,
     paddingHorizontal: Spacing.four,
@@ -289,8 +293,8 @@ const styles = StyleSheet.create({
   },
   scrollToEndButton: {
     alignItems: "center",
-    backgroundColor: "rgba(42, 42, 42, 0.94)",
-    borderColor: "rgba(255, 255, 255, 0.12)",
+    backgroundColor: theme.backgroundElement,
+    borderColor: theme.border,
     borderCurve: "continuous",
     borderRadius: 18,
     borderWidth: 1,
@@ -317,4 +321,4 @@ const styles = StyleSheet.create({
     right: 0,
     top: 0,
   },
-});
+}));

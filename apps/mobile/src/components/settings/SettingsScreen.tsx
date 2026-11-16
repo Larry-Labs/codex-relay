@@ -1,3 +1,5 @@
+import { useTheme } from "@/hooks/use-theme";
+import { t } from "../../i18n";
 import { Heart } from "lucide-react-native";
 import { Pressable, ScrollView, Switch, View } from "react-native";
 import Animated, { FadeIn, FadeOut, LinearTransition } from "react-native-reanimated";
@@ -22,7 +24,7 @@ import {
   codexRelaySponsorLabel,
   codexRelaySponsorUrl,
 } from "@/constants/links";
-import { Colors, Fonts, MaxContentWidth, Spacing } from "@/constants/theme";
+import { Fonts, MaxContentWidth, Spacing } from "@/constants/theme";
 import { hotUpdater, hotUpdaterBaseUrl } from "@/lib/hot-updater";
 import { clearHotUpdaterLogs, formatHotUpdaterLogTime } from "@/lib/hot-updater-logs";
 import { formatRateLimitRemaining } from "@/lib/rate-limits";
@@ -34,6 +36,7 @@ const pushNotificationTrackColor = {
 };
 
 export function SettingsScreen() {
+  const theme = useTheme();
   const {
     appUpdate,
     appUpdateActionLabel,
@@ -71,18 +74,18 @@ export function SettingsScreen() {
         <View style={styles.header}>
           <Pressable
             accessibilityRole="button"
-            accessibilityLabel="Back to threads"
+            accessibilityLabel={t("Back to threads")}
             onPress={closeSettings}
             style={({ pressed }) => [styles.headerButton, pressed && styles.pressed]}
           >
-            <Icon name="back" size={19} tintColor={Colors.dark.text} />
+            <Icon name="back" size={19} tintColor={theme.text} />
           </Pressable>
           <View style={styles.titleGroup}>
             <ThemedText type="smallBold" style={styles.title}>
-              Settings
+              {t("Settings")}
             </ThemedText>
             <ThemedText type="code" themeColor="textSecondary" style={styles.subtitle}>
-              Account
+              {t("Account")}
             </ThemedText>
           </View>
           <View style={styles.headerButtonPlaceholder} />
@@ -95,17 +98,17 @@ export function SettingsScreen() {
         >
           <Animated.View layout={settingsLayoutTransition} style={styles.section}>
             <ThemedText type="small" themeColor="textSecondary" style={styles.sectionLabel}>
-              Project
+              {t("Project")}
             </ThemedText>
             <Animated.View layout={settingsLayoutTransition} style={styles.projectLinkList}>
               <Pressable
                 accessibilityRole="link"
-                accessibilityLabel="Open Codex Relay GitHub repository"
+                accessibilityLabel={t("Open Codex Relay GitHub repository")}
                 onPress={() => openProjectLink(codexRelayRepositoryUrl)}
                 style={({ pressed }) => [styles.projectLinkRow, pressed && styles.pressed]}
               >
                 <View style={styles.projectLinkIcon}>
-                  <FaGithub size={17} color={Colors.dark.text} />
+                  <FaGithub size={17} color={theme.text} />
                 </View>
                 <View style={styles.projectLinkCopy}>
                   <ThemedText type="smallBold" style={styles.projectLinkTitle}>
@@ -120,11 +123,11 @@ export function SettingsScreen() {
                     {codexRelayRepositoryLabel}
                   </ThemedText>
                 </View>
-                <Icon name="externalLink" size={15} tintColor={Colors.dark.textSecondary} />
+                <Icon name="externalLink" size={15} tintColor={theme.textSecondary} />
               </Pressable>
               <Pressable
                 accessibilityRole="link"
-                accessibilityLabel="Open gronxb GitHub Sponsors"
+                accessibilityLabel={t("Open gronxb GitHub Sponsors")}
                 onPress={() => openProjectLink(codexRelaySponsorUrl)}
                 style={({ pressed }) => [styles.projectLinkRow, pressed && styles.pressed]}
               >
@@ -133,7 +136,7 @@ export function SettingsScreen() {
                 </View>
                 <View style={styles.projectLinkCopy}>
                   <ThemedText type="smallBold" style={styles.projectLinkTitle}>
-                    Sponsor
+                    {t("Sponsor")}
                   </ThemedText>
                   <ThemedText
                     type="code"
@@ -144,14 +147,14 @@ export function SettingsScreen() {
                     {codexRelaySponsorLabel}
                   </ThemedText>
                 </View>
-                <Icon name="externalLink" size={15} tintColor={Colors.dark.textSecondary} />
+                <Icon name="externalLink" size={15} tintColor={theme.textSecondary} />
               </Pressable>
             </Animated.View>
           </Animated.View>
 
           <Animated.View layout={settingsLayoutTransition} style={styles.section}>
             <ThemedText type="small" themeColor="textSecondary" style={styles.sectionLabel}>
-              Usage Limits
+              {t("Usage Limits")}
             </ThemedText>
             <Animated.View layout={settingsLayoutTransition} style={styles.usageCard}>
               {rateLimitRows.length > 0 ? (
@@ -175,7 +178,7 @@ export function SettingsScreen() {
                 >
                   <View style={styles.usageCopy}>
                     <ThemedText type="smallBold" style={styles.usageTitle}>
-                      Rate limits
+                      {t("Rate limits")}
                     </ThemedText>
                     <ThemedText
                       type="small"
@@ -183,8 +186,8 @@ export function SettingsScreen() {
                       style={styles.usageSubtitle}
                     >
                       {rateLimitsFetching
-                        ? "Checking current usage"
-                        : "Unavailable from this runtime"}
+                        ? t("Checking current usage")
+                        : t("Unavailable from this runtime")}
                     </ThemedText>
                   </View>
                 </Animated.View>
@@ -194,7 +197,7 @@ export function SettingsScreen() {
 
           <Animated.View layout={settingsLayoutTransition} style={styles.section}>
             <ThemedText type="small" themeColor="textSecondary" style={styles.sectionLabel}>
-              Connected Computer
+              {t("Connected Computer")}
             </ThemedText>
             <Animated.View layout={settingsLayoutTransition} style={styles.connectionPanel}>
               <Animated.View layout={settingsFastLayoutTransition} style={styles.connectionHeader}>
@@ -216,7 +219,7 @@ export function SettingsScreen() {
               </Animated.View>
               {hasPairedSession ? (
                 <>
-                  <InfoLine label="Server" value={compactServer(serverUrl)} />
+                  <InfoLine label={t("Server")} value={compactServer(serverUrl)} />
                   <View style={styles.serverAddressList}>
                     {serverUrlCandidates.map((candidate) => {
                       const isSelected = candidate.url === serverUrl;
@@ -225,7 +228,7 @@ export function SettingsScreen() {
                         <Pressable
                           key={candidate.url}
                           accessibilityRole="button"
-                          accessibilityLabel={`Use ${compactServer(candidate.url)}`}
+                          accessibilityLabel={t("Use {0}", compactServer(candidate.url))}
                           disabled={isSelected || Boolean(switchingServerUrl)}
                           onPress={() => void selectServerAddress(candidate)}
                           style={({ pressed }) => [
@@ -270,7 +273,7 @@ export function SettingsScreen() {
                 </>
               ) : (
                 <ThemedText type="small" themeColor="textSecondary" style={styles.unpairedCopy}>
-                  Pair this device from the main screen to choose a relay server.
+                  {t("Pair this device from the main screen to choose a relay server.")}
                 </ThemedText>
               )}
             </Animated.View>
@@ -279,7 +282,7 @@ export function SettingsScreen() {
           {hasPairedSession ? (
             <Animated.View layout={settingsLayoutTransition} style={styles.section}>
               <ThemedText type="small" themeColor="textSecondary" style={styles.sectionLabel}>
-                Notifications
+                {t("Notifications")}
               </ThemedText>
               <Animated.View layout={settingsLayoutTransition} style={styles.notificationPanel}>
                 {pushNotificationsSupported ? (
@@ -289,37 +292,39 @@ export function SettingsScreen() {
                       themeColor="textSecondary"
                       style={styles.notificationIntro}
                     >
-                      Generic alerts only. Chat content stays on your paired computer.
+                      {t("Generic alerts only. Chat content stays on your paired computer.")}
                     </ThemedText>
                     <PushNotificationToggle
-                      accessibilityLabel="Notify when a Codex turn ends"
+                      accessibilityLabel={t("Notify when a Codex turn ends")}
                       disabled={pushNotificationsLoading || pushNotificationsUpdating}
                       onValueChange={(value) =>
                         void updatePushNotificationPreference("turnTerminal", value)
                       }
-                      subtitle="When Codex completes or fails a turn"
-                      title="Turn complete"
+                      subtitle={t("When Codex completes or fails a turn")}
+                      title={t("Turn complete")}
                       value={pushNotificationPreferences.turnTerminal}
                     />
                     <PushNotificationToggle
-                      accessibilityLabel="Include remaining Codex usage in turn-complete notifications"
+                      accessibilityLabel={t(
+                        "Include remaining Codex usage in turn-complete notifications",
+                      )}
                       disabled={pushNotificationsLoading || pushNotificationsUpdating}
                       onValueChange={(value) =>
                         void updatePushNotificationPreference("includeRemainingUsage", value)
                       }
-                      subtitle="Show the lowest remaining Codex limit after a turn"
-                      title="Remaining usage"
+                      subtitle={t("Show the lowest remaining Codex limit after a turn")}
+                      title={t("Remaining usage")}
                       value={pushNotificationPreferences.includeRemainingUsage}
                     />
                     <PushNotificationToggle
-                      accessibilityLabel="Notify when Codex needs action"
+                      accessibilityLabel={t("Notify when Codex needs action")}
                       disabled={pushNotificationsLoading || pushNotificationsUpdating}
                       onValueChange={(value) =>
                         void updatePushNotificationPreference("actionRequired", value)
                       }
                       showDivider={false}
-                      subtitle="When Codex needs approval or input"
-                      title="Action required"
+                      subtitle={t("When Codex needs approval or input")}
+                      title={t("Action required")}
                       value={pushNotificationPreferences.actionRequired}
                     />
                   </>
@@ -329,7 +334,7 @@ export function SettingsScreen() {
                     themeColor="textSecondary"
                     style={styles.notificationIntro}
                   >
-                    Push notifications are available in the iOS and Android apps.
+                    {t("Push notifications are available in the iOS and Android apps.")}
                   </ThemedText>
                 )}
               </Animated.View>
@@ -339,11 +344,11 @@ export function SettingsScreen() {
           {hasPairedSession ? (
             <Animated.View layout={settingsLayoutTransition} style={styles.section}>
               <ThemedText type="small" themeColor="textSecondary" style={styles.sectionLabel}>
-                Session
+                {t("Session")}
               </ThemedText>
               <Pressable
                 accessibilityRole="button"
-                accessibilityLabel="Sign out"
+                accessibilityLabel={t("Sign out")}
                 onPress={signOut}
                 style={({ pressed }) => [styles.signOutRow, pressed && styles.pressed]}
               >
@@ -353,14 +358,14 @@ export function SettingsScreen() {
                   </View>
                   <View style={styles.signOutCopy}>
                     <ThemedText type="smallBold" style={styles.signOutTitle}>
-                      Sign out
+                      {t("Sign out")}
                     </ThemedText>
                     <ThemedText
                       type="small"
                       themeColor="textSecondary"
                       style={styles.signOutSubtitle}
                     >
-                      Pair again on this device
+                      {t("Pair again on this device")}
                     </ThemedText>
                   </View>
                 </View>
@@ -380,11 +385,12 @@ export function SettingsScreen() {
                   <Icon
                     name={isAppUpdatePending ? "refresh" : "permissionsAuto"}
                     size={12}
-                    tintColor={isAppUpdatePending ? "#93E1B6" : Colors.dark.textSecondary}
+                    tintColor={isAppUpdatePending ? "#93E1B6" : theme.textSecondary}
                   />
                 </View>
                 <ThemedText type="code" themeColor="textSecondary" style={styles.versionText}>
-                  Version {releaseVersionLabel}
+                  {t("Version")}
+                  {releaseVersionLabel}
                   {appUpdate.status === "checking" ? " · checking" : null}
                   {appUpdate.status === "current" ? " · current" : null}
                   {appUpdate.status === "downloading" ? " · downloading" : null}
@@ -403,7 +409,7 @@ export function SettingsScreen() {
                   <Pressable
                     accessibilityRole="button"
                     accessibilityLabel={
-                      appUpdate.status === "ready" ? "Restart app" : "Preparing app update"
+                      appUpdate.status === "ready" ? t("Restart app") : t("Preparing app update")
                     }
                     disabled={isAppUpdateActionDisabled}
                     onPress={() => void applyAppUpdate()}
@@ -442,12 +448,13 @@ export function SettingsScreen() {
               >
                 <View style={styles.hotUpdaterLogHeader}>
                   <ThemedText type="smallBold" style={styles.hotUpdaterLogTitle}>
-                    Logs ({hotUpdater?.getCohort() ?? "none"})
+                    {t("Logs (")}
+                    {hotUpdater?.getCohort() ?? "none"})
                   </ThemedText>
                   <View style={styles.hotUpdaterLogActions}>
                     <Pressable
                       accessibilityRole="button"
-                      accessibilityLabel="Clear HotUpdater logs"
+                      accessibilityLabel={t("Clear HotUpdater logs")}
                       onPress={clearHotUpdaterLogs}
                       style={({ pressed }) => [
                         styles.hotUpdaterLogButton,
@@ -455,12 +462,12 @@ export function SettingsScreen() {
                       ]}
                     >
                       <ThemedText type="code" style={styles.hotUpdaterLogButtonText}>
-                        Clear
+                        {t("Clear")}
                       </ThemedText>
                     </Pressable>
                     <Pressable
                       accessibilityRole="button"
-                      accessibilityLabel="Hide HotUpdater logs"
+                      accessibilityLabel={t("Hide HotUpdater logs")}
                       onPress={() => setShowHotUpdaterLogs(false)}
                       style={({ pressed }) => [
                         styles.hotUpdaterLogButton,
@@ -468,14 +475,14 @@ export function SettingsScreen() {
                       ]}
                     >
                       <ThemedText type="code" style={styles.hotUpdaterLogButtonText}>
-                        Hide
+                        {t("Hide")}
                       </ThemedText>
                     </Pressable>
                   </View>
                 </View>
                 <View style={styles.hotUpdaterConfigRow}>
                   <ThemedText type="code" style={styles.hotUpdaterConfigLabel}>
-                    Base URL
+                    {t("Base URL")}
                   </ThemedText>
                   <ThemedText
                     type="code"
@@ -512,7 +519,7 @@ export function SettingsScreen() {
                   ))
                 ) : (
                   <ThemedText type="small" themeColor="textSecondary" style={styles.versionMessage}>
-                    No OTA download events captured in this session.
+                    {t("No OTA download events captured in this session.")}
                   </ThemedText>
                 )}
               </Animated.View>
@@ -603,7 +610,7 @@ function RateLimitProgressRow({
             style={styles.usageSubtitle}
             numberOfLines={1}
           >
-            {remainingText} left
+            {remainingText} {t("left")}
           </ThemedText>
         </View>
         <View style={[styles.usagePercentBadge, { borderColor: progressColor }]}>
@@ -618,7 +625,7 @@ function RateLimitProgressRow({
           max: 100,
           min: 0,
           now: clampedUsedPercent,
-          text: `${clampedUsedPercent}% used`,
+          text: t("{0}% used", clampedUsedPercent),
         }}
         style={styles.usageProgressTrack}
       >
@@ -631,10 +638,12 @@ function RateLimitProgressRow({
       </View>
       <View style={styles.usageMetaRow}>
         <ThemedText type="code" themeColor="textSecondary" style={styles.usageMetaText}>
-          Used {clampedUsedPercent}%
+          {t("Used")}
+          {clampedUsedPercent}%
         </ThemedText>
         <ThemedText type="code" themeColor="textSecondary" style={styles.usageMetaText}>
-          Remaining {clampedRemainingPercent}%
+          {t("Remaining")}
+          {clampedRemainingPercent}%
         </ThemedText>
       </View>
     </Animated.View>
@@ -678,13 +687,13 @@ function RemoteConfigPanel({ remoteConfig }: { remoteConfig: HotUpdaterRemoteCon
         </ThemedText>
         <Pressable
           accessibilityRole="button"
-          accessibilityLabel="Fetch Remote Config now"
+          accessibilityLabel={t("Fetch Remote Config now")}
           disabled={fetching}
           onPress={() => void fetchNow()}
           style={({ pressed }) => [styles.hotUpdaterLogButton, pressed && styles.pressed]}
         >
           <ThemedText type="code" style={styles.hotUpdaterLogButtonText}>
-            {fetching ? "Fetching" : "Fetch"}
+            {fetching ? t("Fetching") : t("Fetch")}
           </ThemedText>
         </Pressable>
       </View>
@@ -716,10 +725,10 @@ const settingsFastLayoutTransition = LinearTransition.duration(120);
 const settingsEnterTransition = FadeIn.duration(120);
 const settingsExitTransition = FadeOut.duration(90);
 
-const styles = StyleSheet.create({
+const styles = StyleSheet.create((theme) => ({
   screen: {
     alignItems: "center",
-    backgroundColor: Colors.dark.background,
+    backgroundColor: theme.background,
     flex: 1,
   },
   container: {
@@ -737,8 +746,8 @@ const styles = StyleSheet.create({
   },
   headerButton: {
     alignItems: "center",
-    backgroundColor: "rgba(255, 255, 255, 0.08)",
-    borderColor: "rgba(255, 255, 255, 0.1)",
+    backgroundColor: theme.subtle,
+    borderColor: theme.border,
     borderRadius: 20,
     borderWidth: 1,
     height: 40,
@@ -784,8 +793,8 @@ const styles = StyleSheet.create({
     opacity: 0.68,
   },
   projectLinkList: {
-    backgroundColor: Colors.dark.backgroundElement,
-    borderColor: "rgba(255, 255, 255, 0.09)",
+    backgroundColor: theme.backgroundElement,
+    borderColor: theme.border,
     borderRadius: 8,
     borderWidth: 1,
     gap: 7,
@@ -793,8 +802,8 @@ const styles = StyleSheet.create({
   },
   projectLinkRow: {
     alignItems: "center",
-    backgroundColor: "rgba(255, 255, 255, 0.04)",
-    borderColor: "rgba(255, 255, 255, 0.08)",
+    backgroundColor: theme.subtle,
+    borderColor: theme.border,
     borderRadius: 7,
     borderWidth: 1,
     flexDirection: "row",
@@ -805,8 +814,8 @@ const styles = StyleSheet.create({
   },
   projectLinkIcon: {
     alignItems: "center",
-    backgroundColor: "rgba(255, 255, 255, 0.06)",
-    borderColor: "rgba(255, 255, 255, 0.1)",
+    backgroundColor: theme.subtle,
+    borderColor: theme.border,
     borderRadius: 15,
     borderWidth: 1,
     flexShrink: 0,
@@ -886,8 +895,8 @@ const styles = StyleSheet.create({
     lineHeight: 15,
   },
   hotUpdaterLogPanel: {
-    backgroundColor: "rgba(255, 255, 255, 0.05)",
-    borderColor: "rgba(255, 255, 255, 0.1)",
+    backgroundColor: theme.subtle,
+    borderColor: theme.border,
     borderRadius: 8,
     borderWidth: 1,
     gap: Spacing.two,
@@ -909,14 +918,14 @@ const styles = StyleSheet.create({
     gap: Spacing.one,
   },
   hotUpdaterLogButton: {
-    borderColor: "rgba(255, 255, 255, 0.12)",
+    borderColor: theme.border,
     borderRadius: 6,
     borderWidth: 1,
     paddingHorizontal: 7,
     paddingVertical: 4,
   },
   hotUpdaterLogButtonText: {
-    color: Colors.dark.textSecondary,
+    color: theme.textSecondary,
     fontFamily: Fonts.monoMedium,
     fontSize: 9,
     lineHeight: 12,
@@ -941,7 +950,7 @@ const styles = StyleSheet.create({
     lineHeight: 12,
   },
   hotUpdaterConfigValue: {
-    color: Colors.dark.text,
+    color: theme.text,
     fontFamily: Fonts.monoMedium,
     fontSize: 10,
     lineHeight: 14,
@@ -950,19 +959,19 @@ const styles = StyleSheet.create({
     color: "#FFB4A8",
   },
   hotUpdaterLogRow: {
-    borderTopColor: "rgba(255, 255, 255, 0.08)",
+    borderTopColor: theme.border,
     borderTopWidth: 1,
     gap: 2,
     paddingTop: Spacing.two,
   },
   hotUpdaterLogMeta: {
-    color: Colors.dark.textSecondary,
+    color: theme.textSecondary,
     fontFamily: Fonts.monoMedium,
     fontSize: 9,
     lineHeight: 12,
   },
   hotUpdaterLogMessage: {
-    color: Colors.dark.text,
+    color: theme.text,
     fontSize: 12,
     lineHeight: 16,
   },
@@ -971,16 +980,16 @@ const styles = StyleSheet.create({
     lineHeight: 14,
   },
   connectionPanel: {
-    backgroundColor: Colors.dark.backgroundElement,
-    borderColor: "rgba(255, 255, 255, 0.09)",
+    backgroundColor: theme.backgroundElement,
+    borderColor: theme.border,
     borderRadius: 8,
     borderWidth: 1,
     gap: Spacing.two,
     padding: Spacing.three,
   },
   notificationPanel: {
-    backgroundColor: Colors.dark.backgroundElement,
-    borderColor: "rgba(255, 255, 255, 0.09)",
+    backgroundColor: theme.backgroundElement,
+    borderColor: theme.border,
     borderRadius: 8,
     borderWidth: 1,
     overflow: "hidden",
@@ -1000,7 +1009,7 @@ const styles = StyleSheet.create({
     paddingVertical: 10,
   },
   notificationRowDivider: {
-    borderBottomColor: "rgba(255, 255, 255, 0.08)",
+    borderBottomColor: theme.border,
     borderBottomWidth: 1,
   },
   notificationCopy: {
@@ -1017,8 +1026,8 @@ const styles = StyleSheet.create({
     lineHeight: 16,
   },
   usageCard: {
-    backgroundColor: Colors.dark.backgroundElement,
-    borderColor: "rgba(255, 255, 255, 0.09)",
+    backgroundColor: theme.backgroundElement,
+    borderColor: theme.border,
     borderRadius: 8,
     borderWidth: 1,
     overflow: "hidden",
@@ -1030,7 +1039,7 @@ const styles = StyleSheet.create({
     paddingVertical: 12,
   },
   usageRowDivider: {
-    borderBottomColor: "rgba(255, 255, 255, 0.08)",
+    borderBottomColor: theme.border,
     borderBottomWidth: 1,
   },
   usageHeader: {
@@ -1053,7 +1062,7 @@ const styles = StyleSheet.create({
   },
   usagePercentBadge: {
     alignItems: "center",
-    backgroundColor: "rgba(255, 255, 255, 0.05)",
+    backgroundColor: theme.subtle,
     borderRadius: 6,
     borderWidth: 1,
     flexShrink: 0,
@@ -1068,7 +1077,7 @@ const styles = StyleSheet.create({
     lineHeight: 15,
   },
   usageProgressTrack: {
-    backgroundColor: "rgba(255, 255, 255, 0.08)",
+    backgroundColor: theme.subtle,
     borderRadius: 999,
     height: 8,
     overflow: "hidden",
@@ -1118,8 +1127,8 @@ const styles = StyleSheet.create({
     lineHeight: 18,
   },
   connectionBadge: {
-    backgroundColor: "rgba(255, 255, 255, 0.06)",
-    borderColor: "rgba(255, 255, 255, 0.1)",
+    backgroundColor: theme.subtle,
+    borderColor: theme.border,
     borderRadius: 6,
     borderWidth: 1,
     flexShrink: 0,
@@ -1127,7 +1136,7 @@ const styles = StyleSheet.create({
     paddingVertical: 3,
   },
   connectionBadgeText: {
-    color: Colors.dark.textSecondary,
+    color: theme.textSecondary,
     fontFamily: Fonts.monoMedium,
     fontSize: 9,
     lineHeight: 12,
@@ -1141,7 +1150,7 @@ const styles = StyleSheet.create({
     lineHeight: 16,
   },
   infoLineValue: {
-    color: Colors.dark.text,
+    color: theme.text,
     fontSize: 12,
     lineHeight: 16,
   },
@@ -1151,8 +1160,8 @@ const styles = StyleSheet.create({
   },
   serverAddressRow: {
     alignItems: "center",
-    backgroundColor: "rgba(255, 255, 255, 0.04)",
-    borderColor: "rgba(255, 255, 255, 0.08)",
+    backgroundColor: theme.subtle,
+    borderColor: theme.border,
     borderRadius: 7,
     borderWidth: 1,
     flexDirection: "row",
@@ -1180,8 +1189,8 @@ const styles = StyleSheet.create({
   },
   serverAddressStatus: {
     alignItems: "center",
-    backgroundColor: "rgba(255, 255, 255, 0.05)",
-    borderColor: "rgba(255, 255, 255, 0.1)",
+    backgroundColor: theme.subtle,
+    borderColor: theme.border,
     borderRadius: 6,
     borderWidth: 1,
     flexShrink: 0,
@@ -1195,7 +1204,7 @@ const styles = StyleSheet.create({
     borderColor: "rgba(147, 225, 182, 0.28)",
   },
   serverAddressStatusText: {
-    color: Colors.dark.textSecondary,
+    color: theme.textSecondary,
     fontFamily: Fonts.monoMedium,
     fontSize: 9,
     lineHeight: 12,
@@ -1244,4 +1253,4 @@ const styles = StyleSheet.create({
   pressed: {
     opacity: 0.7,
   },
-});
+}));

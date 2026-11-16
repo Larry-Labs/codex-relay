@@ -1,3 +1,5 @@
+import { useTheme } from "@/hooks/use-theme";
+import { t } from "../../../i18n";
 import type { WorkspaceChangesResponse } from "codex-relay/api-schema";
 import { memo, useMemo, useState } from "react";
 import {
@@ -22,7 +24,7 @@ import { Button } from "@/components/ui/button";
 import type { AppIconName } from "@/components/ui/icon";
 import { Icon } from "@/components/ui/icon";
 import { Text as UiText } from "@/components/ui/text";
-import { Colors, Fonts, Spacing } from "@/constants/theme";
+import { Fonts, Spacing } from "@/constants/theme";
 import { hapticSelection } from "@/lib/haptics";
 import { workspaceName } from "@/lib/workspace-name";
 
@@ -54,6 +56,7 @@ export const GitWorkspacePreviewTab = memo(function GitWorkspacePreviewTab({
   onCreatePullRequest: () => Promise<void> | void;
   onRefreshChanges: () => Promise<void> | void;
 }) {
+  const theme = useTheme();
   const [isPullRefreshing, setPullRefreshing] = useState(false);
   const [pendingAction, setPendingAction] = useState<PendingAction>(null);
   const [publishConfirmation, setPublishConfirmation] = useState<PublishConfirmation>(null);
@@ -74,7 +77,7 @@ export const GitWorkspacePreviewTab = memo(function GitWorkspacePreviewTab({
     try {
       await callback();
     } catch (caught) {
-      Alert.alert("Action failed", errorMessage(caught));
+      Alert.alert(t("Action failed"), errorMessage(caught));
     } finally {
       setPendingAction(null);
     }
@@ -103,10 +106,10 @@ export const GitWorkspacePreviewTab = memo(function GitWorkspacePreviewTab({
         contentContainerStyle={[styles.diffContent, isInitialLoading && styles.loadingGitContent]}
         refreshControl={
           <RefreshControl
-            colors={[Colors.dark.text]}
-            progressBackgroundColor={Colors.dark.backgroundElement}
+            colors={[theme.text]}
+            progressBackgroundColor={theme.backgroundElement}
             refreshing={isPullRefreshing}
-            tintColor={Colors.dark.text}
+            tintColor={theme.text}
             onRefresh={() => void refreshFromPull()}
           />
         }
@@ -121,7 +124,7 @@ export const GitWorkspacePreviewTab = memo(function GitWorkspacePreviewTab({
             layout={gitPreviewLayoutTransition}
             style={styles.emptyState}
           >
-            <ThemedText type="smallBold">Unable to load changes</ThemedText>
+            <ThemedText type="smallBold">{t("Unable to load changes")}</ThemedText>
             <ThemedText type="small" themeColor="textSecondary">
               {workspaceChangesError}
             </ThemedText>
@@ -167,9 +170,9 @@ export const GitWorkspacePreviewTab = memo(function GitWorkspacePreviewTab({
                 layout={gitPreviewLayoutTransition}
                 style={styles.emptyState}
               >
-                <ThemedText type="smallBold">Only untracked files changed</ThemedText>
+                <ThemedText type="smallBold">{t("Only untracked files changed")}</ThemedText>
                 <ThemedText type="small" themeColor="textSecondary">
-                  Git diff has no tracked-file patch to show yet.
+                  {t("Git diff has no tracked-file patch to show yet.")}
                 </ThemedText>
               </Animated.View>
             )}
@@ -201,7 +204,7 @@ export const GitWorkspacePreviewTab = memo(function GitWorkspacePreviewTab({
         )}
       </ScrollView>
       <AppBottomSheet
-        title={publishConfirmation ? publishConfirmationTitle(publishConfirmation) : "Publish"}
+        title={publishConfirmation ? publishConfirmationTitle(publishConfirmation) : t("Publish")}
         subtitle={workspaceChanges ? publishConfirmationSubtitle(workspaceChanges) : undefined}
         onClose={() => setPublishConfirmation(null)}
         visible={publishConfirmation !== null}
@@ -230,15 +233,16 @@ function EmptyChangesCard() {
       layout={gitPreviewLayoutTransition}
       style={styles.emptyState}
     >
-      <ThemedText type="smallBold">No workspace changes</ThemedText>
+      <ThemedText type="smallBold">{t("No workspace changes")}</ThemedText>
       <ThemedText type="small" themeColor="textSecondary">
-        The current workspace is clean.
+        {t("The current workspace is clean.")}
       </ThemedText>
     </Animated.View>
   );
 }
 
 function LoadingGitIndicator() {
+  const theme = useTheme();
   return (
     <Animated.View
       entering={gitPreviewEnterTransition}
@@ -246,16 +250,16 @@ function LoadingGitIndicator() {
       layout={gitPreviewLayoutTransition}
       style={styles.loadingGit}
     >
-      <ActivityIndicator color={Colors.dark.textSecondary} size="small" />
+      <ActivityIndicator color={theme.textSecondary} size="small" />
       <ThemedText type="smallBold" style={styles.loadingGitText}>
-        Loading Git
+        {t("Loading Git")}
       </ThemedText>
     </Animated.View>
   );
 }
 
 function publishConfirmationTitle(action: NonNullable<PublishConfirmation>) {
-  return action === "commit-push" ? "Commit & Push" : "Create PR";
+  return action === "commit-push" ? t("Commit & Push") : t("Create PR");
 }
 
 function publishConfirmationIcon(action: NonNullable<PublishConfirmation>): AppIconName {
@@ -263,15 +267,18 @@ function publishConfirmationIcon(action: NonNullable<PublishConfirmation>): AppI
 }
 
 function publishConfirmationSubtitle(changes: WorkspaceChangesResponse) {
-  return `${visibleChangedFileCount(changes)} files, +${changes.stats.additions} -${
-    changes.stats.deletions
-  }`;
+  return t(
+    "{0} files, +{1} -{2}",
+    visibleChangedFileCount(changes),
+    changes.stats.additions,
+    changes.stats.deletions,
+  );
 }
 
 function publishConfirmationActionSubtitle(action: NonNullable<PublishConfirmation>) {
   return action === "commit-push"
-    ? "Commit current workspace changes and push this branch."
-    : "Create a draft pull request from current workspace changes.";
+    ? t("Commit current workspace changes and push this branch.")
+    : t("Create a draft pull request from current workspace changes.");
 }
 
 function DiffActions({
@@ -307,23 +314,24 @@ function DiffActions({
       <Animated.View layout={gitPreviewFastLayoutTransition} style={styles.actionSection}>
         <Animated.View layout={gitPreviewFastLayoutTransition} style={styles.sectionHeader}>
           <ThemedText type="smallBold" style={styles.sectionTitle}>
-            Publish
+            {t("Publish")}
           </ThemedText>
           <ThemedText type="code" themeColor="textSecondary" style={styles.sectionMeta}>
-            {changedFileCount} files, +{changes.stats.additions} -{changes.stats.deletions}
+            {changedFileCount} {t("files, +")}
+            {changes.stats.additions} -{changes.stats.deletions}
           </ThemedText>
         </Animated.View>
         <Animated.View layout={gitPreviewFastLayoutTransition} style={styles.publishButtonRow}>
           <DiffActionButton
             disabled={isActionDisabled}
             iconName="upload"
-            label={pendingAction === "commit-push" ? "Starting" : "Commit & Push"}
+            label={pendingAction === "commit-push" ? t("Starting") : t("Commit & Push")}
             onPress={onCommitPush}
           />
           <DiffActionButton
             disabled={isActionDisabled}
             iconName="pullRequest"
-            label={pendingAction === "pr" ? "Starting PR" : "Create PR"}
+            label={pendingAction === "pr" ? t("Starting PR") : t("Create PR")}
             onPress={onCreatePullRequest}
           />
         </Animated.View>
@@ -347,6 +355,7 @@ function BranchSwitcher({
   workspaceName: string;
   onCheckoutBranch: (branch: string) => void;
 }) {
+  const theme = useTheme();
   const [isSheetOpen, setSheetOpen] = useState(false);
   const [selectedBranch, setSelectedBranch] = useState<BranchEntry | undefined>(
     () => branches.find((branch) => branch.current) ?? branches[0],
@@ -396,15 +405,15 @@ function BranchSwitcher({
     >
       <Animated.View layout={gitPreviewFastLayoutTransition} style={styles.sectionHeader}>
         <ThemedText type="smallBold" style={styles.sectionTitle}>
-          Branch
+          {t("Branch")}
         </ThemedText>
         <ThemedText type="code" themeColor="textSecondary" style={styles.sectionMeta}>
-          {branches.length} available
+          {branches.length} {t("available")}
         </ThemedText>
       </Animated.View>
       <Pressable
         accessibilityRole="button"
-        accessibilityLabel="Open branch switcher"
+        accessibilityLabel={t("Open branch switcher")}
         disabled={disabled}
         onPress={openSheet}
         style={({ pressed }) => [
@@ -415,7 +424,7 @@ function BranchSwitcher({
       >
         <View pointerEvents="none" style={styles.branchSwitchContent}>
           <View style={styles.branchSwitchIcon}>
-            <Icon name="branch" size={16} tintColor={Colors.dark.text} />
+            <Icon name="branch" size={16} tintColor={theme.text} />
           </View>
           <View style={styles.branchSwitchCopy}>
             <ThemedText type="smallBold" style={styles.branchSwitchTitle} numberOfLines={1}>
@@ -427,14 +436,14 @@ function BranchSwitcher({
               style={styles.branchSwitchSubtitle}
               numberOfLines={1}
             >
-              Switch workspace branch
+              {t("Switch workspace branch")}
             </ThemedText>
           </View>
-          <Icon name="chevronRight" size={16} tintColor={Colors.dark.textSecondary} />
+          <Icon name="chevronRight" size={16} tintColor={theme.textSecondary} />
         </View>
       </Pressable>
       <AppBottomSheet
-        title="Switch Branch"
+        title={t("Switch Branch")}
         subtitle={workspaceName}
         onClose={() => setSheetOpen(false)}
         scrollable={false}
@@ -442,7 +451,7 @@ function BranchSwitcher({
       >
         <View style={styles.branchSheetContent}>
           <View style={styles.branchCreateCard}>
-            <UiText style={styles.branchCreateLabel}>Branch name</UiText>
+            <UiText style={styles.branchCreateLabel}>{t("Branch name")}</UiText>
             <View style={styles.branchCreateRow}>
               <AppBottomSheetTextInput
                 autoCapitalize="none"
@@ -451,16 +460,18 @@ function BranchSwitcher({
                 onChangeText={updateBranchDraft}
                 onSubmitEditing={confirmCheckout}
                 placeholder="feature/mobile-polish"
-                placeholderTextColor={Colors.dark.textSecondary}
+                placeholderTextColor={theme.textSecondary}
                 returnKeyType="go"
                 selectTextOnFocus
-                selectionColor={Colors.dark.text}
+                selectionColor={theme.text}
                 style={styles.branchCreateInput}
                 value={branchDraft}
               />
               <Button
                 accessibilityRole="button"
-                accessibilityLabel={isCreatingBranch ? "Create and switch branch" : "Switch branch"}
+                accessibilityLabel={
+                  isCreatingBranch ? t("Create and switch branch") : t("Switch branch")
+                }
                 disabled={!canCheckout}
                 onPress={confirmCheckout}
                 size="default"
@@ -477,16 +488,16 @@ function BranchSwitcher({
                   style={styles.branchInlineButtonText}
                   numberOfLines={1}
                 >
-                  {isCreatingBranch ? "Create" : "Switch"}
+                  {isCreatingBranch ? t("Create") : t("Switch")}
                 </UiText>
               </Button>
             </View>
             <UiText style={styles.branchCreateHint} numberOfLines={2}>
               {isCreatingBranch
-                ? "Creates a new branch from the current checkout, then switches to it."
+                ? t("Creates a new branch from the current checkout, then switches to it.")
                 : draftBranch?.current
-                  ? "This is the current branch."
-                  : "Matches an existing branch and switches to it."}
+                  ? t("This is the current branch.")
+                  : t("Matches an existing branch and switches to it.")}
             </UiText>
           </View>
 
@@ -500,14 +511,14 @@ function BranchSwitcher({
               return (
                 <SheetActionRow
                   key={branch.name}
-                  accessibilityLabel={`Select ${branch.name}`}
+                  accessibilityLabel={t("Select {0}", branch.name)}
                   icon="branch"
                   onPress={() => {
                     setSelectedBranch(branch);
                     setBranchDraft(branch.name);
                   }}
                   selected={selected}
-                  subtitle={branch.current ? "Current branch" : "Available branch"}
+                  subtitle={branch.current ? t("Current branch") : t("Available branch")}
                   title={branch.name}
                   trailing={<SheetSelectedDot selected={selected} />}
                 />
@@ -554,7 +565,7 @@ function DiffSummary({ changes }: { changes: WorkspaceChangesResponse }) {
       style={styles.summaryBar}
     >
       <ThemedText type="smallBold" style={styles.summaryTitle} numberOfLines={1}>
-        {changedFileCount} files changed
+        {changedFileCount} {t("files changed")}
       </ThemedText>
       <View style={styles.summaryStats}>
         <ThemedText type="code" style={styles.additions}>
@@ -589,7 +600,9 @@ function DiffFilesPreview({ files }: { files: WorkspaceChangeFile[] }) {
             style={styles.noPatchText}
             numberOfLines={2}
           >
-            Showing first {visibleFiles.length} of {files.length} changed files.
+            {t("Showing first")}
+            {visibleFiles.length} {t("of")}
+            {files.length} {t("changed files.")}
           </ThemedText>
         </View>
       ) : null}
@@ -634,7 +647,7 @@ function DiffFileCard({ file }: { file: WorkspaceChangeFile }) {
             style={styles.noPatchText}
             numberOfLines={2}
           >
-            No text patch available for this file.
+            {t("No text patch available for this file.")}
           </ThemedText>
         </View>
       )}
@@ -670,7 +683,7 @@ function DiffPatchBlock({ patch }: { patch: string }) {
         ))}
         {hiddenLineCount > 0 ? (
           <UiText selectable style={[styles.patchLine, styles.patchLineMeta]}>
-            ... {hiddenLineCount} more diff lines
+            ... {hiddenLineCount} {t("more diff lines")}
           </UiText>
         ) : null}
       </View>
@@ -696,18 +709,18 @@ function patchLineStyle(line: string) {
 
 function shortStatus(status: string) {
   switch (status) {
-    case "Added":
-    case "Untracked":
+    case t("Added"):
+    case t("Untracked"):
       return "A";
-    case "Deleted":
+    case t("Deleted"):
       return "D";
-    case "Renamed":
+    case t("Renamed"):
       return "R";
-    case "Copied":
+    case t("Copied"):
       return "C";
-    case "Typechange":
+    case t("Typechange"):
       return "T";
-    case "Conflicted":
+    case t("Conflicted"):
       return "U";
     default:
       return "M";
@@ -731,6 +744,7 @@ function PreviewControlButton({
   onPress: () => void;
   selected?: boolean;
 }) {
+  const theme = useTheme();
   return (
     <View style={styles.controlButtonSlot}>
       <Button
@@ -749,11 +763,7 @@ function PreviewControlButton({
           pressed && styles.pressed,
         ]}
       >
-        <Icon
-          name={iconName}
-          size={14}
-          tintColor={active ? Colors.dark.text : Colors.dark.textSecondary}
-        />
+        <Icon name={iconName} size={14} tintColor={active ? theme.text : theme.textSecondary} />
         <UiText
           className="text-foreground"
           numberOfLines={1}
@@ -779,7 +789,7 @@ const gitPreviewFastLayoutTransition = LinearTransition.duration(120);
 const gitPreviewEnterTransition = FadeIn.duration(120);
 const gitPreviewExitTransition = FadeOut.duration(90);
 
-const styles = StyleSheet.create({
+const styles = StyleSheet.create((theme) => ({
   contentPane: {
     flex: 1,
     marginHorizontal: Spacing.three,
@@ -796,7 +806,7 @@ const styles = StyleSheet.create({
     gap: Spacing.two,
   },
   actionsPanel: {
-    backgroundColor: "rgba(255, 255, 255, 0.06)",
+    backgroundColor: theme.subtle,
     borderColor: "rgba(132, 145, 165, 0.22)",
     borderRadius: 8,
     borderWidth: 1,
@@ -843,11 +853,11 @@ const styles = StyleSheet.create({
     width: "100%",
   },
   controlButtonActive: {
-    backgroundColor: "rgba(255, 255, 255, 0.16)",
-    borderColor: "rgba(255, 255, 255, 0.24)",
+    backgroundColor: theme.subtle,
+    borderColor: theme.border,
   },
   controlButtonText: {
-    color: Colors.dark.textSecondary,
+    color: theme.textSecondary,
     flexShrink: 1,
     fontFamily: Fonts.sansBold,
     fontSize: 13,
@@ -855,12 +865,12 @@ const styles = StyleSheet.create({
     textAlign: "center",
   },
   controlButtonTextActive: {
-    color: Colors.dark.text,
+    color: theme.text,
   },
   branchSwitchButton: {
     alignItems: "center",
     alignSelf: "stretch",
-    backgroundColor: "rgba(255, 255, 255, 0.07)",
+    backgroundColor: theme.subtle,
     borderColor: "rgba(132, 145, 165, 0.22)",
     borderRadius: 8,
     borderWidth: 1,
@@ -878,7 +888,7 @@ const styles = StyleSheet.create({
   },
   branchSwitchIcon: {
     alignItems: "center",
-    backgroundColor: "rgba(255, 255, 255, 0.1)",
+    backgroundColor: theme.subtle,
     borderColor: "rgba(132, 145, 165, 0.22)",
     borderRadius: 16,
     borderWidth: 1,
@@ -892,7 +902,7 @@ const styles = StyleSheet.create({
     minWidth: 0,
   },
   branchSwitchTitle: {
-    color: Colors.dark.text,
+    color: theme.text,
     fontSize: 13,
     lineHeight: 18,
   },
@@ -904,7 +914,7 @@ const styles = StyleSheet.create({
     gap: Spacing.two,
   },
   branchCreateCard: {
-    backgroundColor: "rgba(255, 255, 255, 0.06)",
+    backgroundColor: theme.subtle,
     borderColor: "rgba(132, 145, 165, 0.2)",
     borderRadius: 8,
     borderWidth: 1,
@@ -912,17 +922,17 @@ const styles = StyleSheet.create({
     padding: Spacing.two,
   },
   branchCreateHint: {
-    color: Colors.dark.textSecondary,
+    color: theme.textSecondary,
     fontFamily: Fonts.sansMedium,
     fontSize: 12,
     lineHeight: 16,
   },
   branchCreateInput: {
     backgroundColor: "rgba(0, 0, 0, 0.22)",
-    borderColor: "rgba(255, 255, 255, 0.16)",
+    borderColor: theme.border,
     borderRadius: 8,
     borderWidth: 1,
-    color: Colors.dark.text,
+    color: theme.text,
     flex: 1,
     fontFamily: Fonts.mono,
     fontSize: 15,
@@ -933,7 +943,7 @@ const styles = StyleSheet.create({
     paddingVertical: 0,
   },
   branchCreateLabel: {
-    color: Colors.dark.text,
+    color: theme.text,
     fontFamily: Fonts.sansBold,
     fontSize: 12,
     lineHeight: 16,
@@ -958,7 +968,7 @@ const styles = StyleSheet.create({
     paddingHorizontal: Spacing.two,
   },
   branchInlineButtonText: {
-    color: Colors.dark.text,
+    color: theme.text,
     fontFamily: Fonts.sansBold,
     fontSize: 14,
     lineHeight: 19,
@@ -975,7 +985,7 @@ const styles = StyleSheet.create({
   },
   summaryBar: {
     alignItems: "center",
-    backgroundColor: "rgba(255, 255, 255, 0.06)",
+    backgroundColor: theme.subtle,
     borderColor: "rgba(132, 145, 165, 0.2)",
     borderRadius: 8,
     borderWidth: 1,
@@ -1005,7 +1015,7 @@ const styles = StyleSheet.create({
     lineHeight: 16,
   },
   fileCard: {
-    backgroundColor: "rgba(255, 255, 255, 0.055)",
+    backgroundColor: theme.subtle,
     borderColor: "rgba(132, 145, 165, 0.22)",
     borderRadius: 8,
     borderWidth: 1,
@@ -1028,7 +1038,7 @@ const styles = StyleSheet.create({
   },
   statusBadge: {
     alignItems: "center",
-    backgroundColor: "rgba(255, 255, 255, 0.1)",
+    backgroundColor: theme.subtle,
     borderColor: "rgba(132, 145, 165, 0.24)",
     borderRadius: 5,
     borderWidth: 1,
@@ -1037,7 +1047,7 @@ const styles = StyleSheet.create({
     width: 24,
   },
   statusBadgeText: {
-    color: Colors.dark.text,
+    color: theme.text,
     fontSize: 11,
     lineHeight: 14,
   },
@@ -1046,7 +1056,7 @@ const styles = StyleSheet.create({
     lineHeight: 16,
   },
   filePath: {
-    color: Colors.dark.text,
+    color: theme.text,
     flexShrink: 1,
     fontSize: 12,
     lineHeight: 17,
@@ -1076,14 +1086,14 @@ const styles = StyleSheet.create({
     color: "#FFB3B3",
   },
   patchLineHunk: {
-    backgroundColor: "rgba(255, 255, 255, 0.08)",
-    color: Colors.dark.text,
+    backgroundColor: theme.subtle,
+    color: theme.text,
   },
   patchLineMeta: {
     color: "#8B98AA",
   },
   patchLineContext: {
-    color: Colors.dark.textSecondary,
+    color: theme.textSecondary,
   },
   noPatch: {
     paddingHorizontal: Spacing.two,
@@ -1094,7 +1104,7 @@ const styles = StyleSheet.create({
     lineHeight: 17,
   },
   emptyState: {
-    backgroundColor: "rgba(255, 255, 255, 0.06)",
+    backgroundColor: theme.subtle,
     borderColor: "rgba(132, 145, 165, 0.2)",
     borderRadius: 8,
     borderWidth: 1,
@@ -1108,7 +1118,7 @@ const styles = StyleSheet.create({
     minHeight: 180,
   },
   loadingGitText: {
-    color: Colors.dark.textSecondary,
+    color: theme.textSecondary,
     fontSize: 13,
     lineHeight: 18,
   },
@@ -1118,4 +1128,4 @@ const styles = StyleSheet.create({
   pressed: {
     opacity: 0.7,
   },
-});
+}));

@@ -52,7 +52,7 @@ describe("relay version policy", () => {
   it("reports an unavailable relay for the sidebar", () => {
     expect(evaluateRelayVersion(undefined, new Error("offline"))).toMatchObject({
       compatible: false,
-      current: "Unavailable",
+      current: "不可用",
       required: "1.6.0",
     });
   });

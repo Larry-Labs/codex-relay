@@ -1,3 +1,4 @@
+import { t } from "../i18n";
 import "react-native-get-random-values";
 
 import { errorMessage } from "./api-error-message";
@@ -170,7 +171,7 @@ class PairingCandidateConnectionError extends Error {
   serverUrl: string;
 
   constructor(serverUrl: string, cause: unknown) {
-    super(`Could not reach ${serverUrl}: ${errorMessage(cause, "network error")}`);
+    super(t("Could not reach {0}: {1}", serverUrl, errorMessage(cause, "network error")));
     this.name = "PairingCandidateConnectionError";
     this.serverUrl = serverUrl;
   }
@@ -235,12 +236,14 @@ export async function pairWithQrPayload(
         timeoutMs: pairingConnectTimeoutMs,
       });
       if (!response.ok || !VersionResponseSchema.safeParse(await response.json()).success) {
-        throw new Error(`No Codex Relay found at ${serverUrl}.`);
+        throw new Error(t("No Codex Relay found at {0}.", serverUrl));
       }
     },
   ).catch(() => {
     throw new Error(
-      "Could not reach your computer. Check that the relay is running and both devices are on the same LAN or connected to Tailscale.",
+      t(
+        "Could not reach your computer. Check that the relay is running and both devices are on the same LAN or connected to Tailscale.",
+      ),
     );
   });
   const serverUrls = [
@@ -301,13 +304,13 @@ async function pairWithApproval(
 
   if (!response.ok) {
     throw new Error(
-      errorMessage(responsePayload, `Codex Relay server returned ${response.status}`),
+      errorMessage(responsePayload, t("Codex Relay server returned {0}", response.status)),
     );
   }
 
   const parsed = PairResponseSchema.parse(responsePayload);
   if (!parsed.approvalCode) {
-    throw new Error("Pairing response did not include an approval code.");
+    throw new Error(t("Pairing response did not include an approval code."));
   }
 
   attachApprovalCode(securePairing, parsed.approvalCode);
@@ -337,13 +340,13 @@ async function waitForPairingApproval(serverUrl: string, approvalCode: string) {
     }
     if (!response.ok) {
       throw new Error(
-        errorMessage(responsePayload, `Codex Relay server returned ${response.status}`),
+        errorMessage(responsePayload, t("Codex Relay server returned {0}", response.status)),
       );
     }
     return PairResponseSchema.parse(responsePayload);
   }
 
-  throw new Error("Pairing approval timed out.");
+  throw new Error(t("Pairing approval timed out."));
 }
 
 async function fetchWithNetworkContext(url: string, init?: NetworkRequestInit) {
@@ -429,30 +432,30 @@ export async function refreshSession() {
 
 function parsePairingQrPayload(payload: unknown): PairingQrPayload {
   if (typeof payload !== "string" || !payload.trim()) {
-    throw new PairingQrPayloadError(`Pairing QR payload was empty (${String(payload)}).`);
+    throw new PairingQrPayloadError(t("Pairing QR payload was empty ({0}).", String(payload)));
   }
 
   let parsed: URL;
   try {
     parsed = new URL(payload.trim());
   } catch {
-    throw new PairingQrPayloadError("Scan the pairing QR from the Codex Relay server.");
+    throw new PairingQrPayloadError(t("Scan the pairing QR from the Codex Relay server."));
   }
   if (parsed.protocol !== "codex-relay:" || parsed.hostname !== "pair") {
-    throw new PairingQrPayloadError("Scan the pairing QR from the Codex Relay server.");
+    throw new PairingQrPayloadError(t("Scan the pairing QR from the Codex Relay server."));
   }
 
   const serverUrl = parsed.searchParams.get("serverUrl");
   const serverPublicKey = parsed.searchParams.get("serverPublicKey")?.trim();
   if (!serverUrl || !serverPublicKey) {
-    throw new PairingQrPayloadError("Pairing QR code is missing connection details.");
+    throw new PairingQrPayloadError(t("Pairing QR code is missing connection details."));
   }
 
   let normalizedServerUrl: string;
   try {
     normalizedServerUrl = normalizeServerUrl(serverUrl);
   } catch {
-    throw new PairingQrPayloadError("Pairing QR code has an invalid server URL.");
+    throw new PairingQrPayloadError(t("Pairing QR code has an invalid server URL."));
   }
 
   return {
@@ -508,8 +511,11 @@ function parsePairingServerUrlsParam(value: string | null) {
 function pairingCandidateFailureMessage(errors: PairingCandidateConnectionError[]) {
   const attemptedUrls = errors.map((error) => error.serverUrl).join(", ");
   return attemptedUrls
-    ? `Could not reach any server URL from the pairing QR. Tried: ${attemptedUrls}. Make sure this device is on the same network or Tailscale is connected.`
-    : "Could not reach the server URL from the pairing QR.";
+    ? t(
+        "Could not reach any server URL from the pairing QR. Tried: {0}. Make sure this device is on the same network or Tailscale is connected.",
+        attemptedUrls,
+      )
+    : t("Could not reach the server URL from the pairing QR.");
 }
 
 export async function getStatus(): Promise<StatusResponse> {
@@ -783,7 +789,9 @@ export function streamWorkspaceTerminalOutput(
           try {
             payload = decryptResponsePayload(JSON.parse(text));
           } catch {}
-          fail(new Error(errorMessage(payload, `Codex Relay server returned ${response.status}`)));
+          fail(
+            new Error(errorMessage(payload, t("Codex Relay server returned {0}", response.status))),
+          );
         });
         return;
       }
@@ -792,7 +800,7 @@ export function streamWorkspaceTerminalOutput(
       }
     })
     .catch((error: unknown) => {
-      fail(new Error(errorMessage(error, "Codex Relay terminal stream failed.")));
+      fail(new Error(errorMessage(error, t("Codex Relay terminal stream failed."))));
     });
 
   return () => {
@@ -862,7 +870,7 @@ function dispatchTerminalOutputSseChunk(
     handlers.onOutput(WorkspaceTerminalOutputResponseSchema.parse(payload));
     return true;
   } catch {
-    handlers.onError(new Error("Codex Relay server returned invalid terminal output."));
+    handlers.onError(new Error(t("Codex Relay server returned invalid terminal output.")));
     return false;
   }
 }
@@ -908,7 +916,7 @@ async function requestNoContent(path: string, init: RequestInit) {
   }
 
   const payload = decryptResponsePayload(await response.json().catch(() => undefined));
-  const message = errorMessage(payload, `Codex Relay server returned ${response.status}`);
+  const message = errorMessage(payload, t("Codex Relay server returned {0}", response.status));
   throw new CodexRelayApiError(message, response.status, errorCode(payload));
 }
 
@@ -1036,13 +1044,13 @@ export function streamThreadRun(
       try {
         handlers.onEvent(parseThreadRunStreamPayload(event.data, decryptResponsePayload));
       } catch {
-        handlers.onError(new Error("Codex Relay server returned an invalid stream event."));
+        handlers.onError(new Error(t("Codex Relay server returned an invalid stream event.")));
       }
     });
   }
 
   source.addEventListener("error", (event) => {
-    const message = "message" in event ? event.message : "Codex Relay stream failed.";
+    const message = "message" in event ? event.message : t("Codex Relay stream failed.");
     handlers.onError(new Error(message));
   });
   source.addEventListener("close", () => {
@@ -1111,7 +1119,9 @@ function streamThreadRunWithDirectFetch(
           try {
             payload = decryptResponsePayload(JSON.parse(text));
           } catch {}
-          fail(new Error(errorMessage(payload, `Codex Relay server returned ${response.status}`)));
+          fail(
+            new Error(errorMessage(payload, t("Codex Relay server returned {0}", response.status))),
+          );
         });
         return;
       }
@@ -1122,7 +1132,7 @@ function streamThreadRunWithDirectFetch(
       close();
     })
     .catch((error: unknown) => {
-      fail(new Error(errorMessage(error, "Codex Relay stream failed.")));
+      fail(new Error(errorMessage(error, t("Codex Relay stream failed."))));
     });
 
   return () => {
@@ -1277,7 +1287,7 @@ async function request<T>(
   const payload = decryptResponsePayload(await response.json().catch(() => undefined));
 
   if (!response.ok) {
-    const message = errorMessage(payload, `Codex Relay server returned ${response.status}`);
+    const message = errorMessage(payload, t("Codex Relay server returned {0}", response.status));
     throw new CodexRelayApiError(message, response.status, errorCode(payload));
   }
 

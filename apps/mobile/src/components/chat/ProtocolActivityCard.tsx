@@ -1,3 +1,4 @@
+import { t } from "../../i18n";
 import type { ChatMessage, ThreadMessageDetailField } from "codex-relay/api-schema";
 import { useQueryClient } from "@tanstack/react-query";
 import { useState } from "react";
@@ -62,8 +63,8 @@ export function ProtocolActivityCard({ message }: { message: ChatMessage }) {
     } catch (caught) {
       hapticWarning();
       Alert.alert(
-        "Approval failed",
-        caught instanceof Error ? caught.message : "Unable to respond.",
+        t("Approval failed"),
+        caught instanceof Error ? caught.message : t("Unable to respond."),
       );
     } finally {
       setResolving(false);
@@ -74,7 +75,7 @@ export function ProtocolActivityCard({ message }: { message: ChatMessage }) {
     return (
       <>
         <Pressable
-          accessibilityLabel="Open details for Plan"
+          accessibilityLabel={t("Open details for Plan")}
           accessibilityRole="button"
           onPress={() => setIsDetailVisible(true)}
           style={({ pressed }) => [
@@ -87,7 +88,7 @@ export function ProtocolActivityCard({ message }: { message: ChatMessage }) {
           ]}
         >
           <ThemedText type="code" style={[styles.planLabel, { color: model.color }]}>
-            Plan
+            {t("Plan")}
           </ThemedText>
           <PlanMarkdown markdown={planBody(message)} variant="compact" />
         </Pressable>
@@ -129,7 +130,7 @@ export function ProtocolActivityCard({ message }: { message: ChatMessage }) {
           ]}
         >
           <Pressable
-            accessibilityLabel={`Open details for ${model.label}`}
+            accessibilityLabel={t("Open details for {0}", model.label)}
             accessibilityRole="button"
             onPress={() => setIsDetailVisible(true)}
             style={({ pressed }) => [styles.fileChangeHeader, pressed && styles.rowPressed]}
@@ -174,7 +175,7 @@ export function ProtocolActivityCard({ message }: { message: ChatMessage }) {
         ]}
       >
         <Pressable
-          accessibilityLabel={`Open details for ${model.label}`}
+          accessibilityLabel={t("Open details for {0}", model.label)}
           accessibilityRole="button"
           onPress={() => setIsDetailVisible(true)}
           style={({ pressed }) => [
@@ -227,7 +228,7 @@ export function ProtocolActivityCard({ message }: { message: ChatMessage }) {
                   editable={!isResolving}
                   multiline
                   onChangeText={setAnswer}
-                  placeholder="Type your answer"
+                  placeholder={t("Type your answer")}
                   placeholderTextColor="rgba(176, 180, 186, 0.72)"
                   style={styles.answerInput}
                   value={answer}
@@ -237,21 +238,21 @@ export function ProtocolActivityCard({ message }: { message: ChatMessage }) {
             <View style={styles.approvalButtonRow}>
               <ApprovalButton
                 disabled={isResolving}
-                label={approvalKind === "structuredUserInput" ? "Send" : "Approve"}
+                label={approvalKind === "structuredUserInput" ? t("Send") : t("Approve")}
                 onPress={() => submitDecision("approve")}
                 tone="accept"
               />
               {approvalKind === "commandExecution" || approvalKind === "fileChange" ? (
                 <ApprovalButton
                   disabled={isResolving}
-                  label="Session"
+                  label={t("Session")}
                   onPress={() => submitDecision("approve-for-session")}
                   tone="neutral"
                 />
               ) : null}
               <ApprovalButton
                 disabled={isResolving}
-                label="Deny"
+                label={t("Deny")}
                 onPress={() => submitDecision("deny")}
                 tone="deny"
               />
@@ -261,7 +262,8 @@ export function ProtocolActivityCard({ message }: { message: ChatMessage }) {
 
         {displayedResolution ? (
           <ThemedText type="code" themeColor="textSecondary" style={styles.resolvedText}>
-            Responded: {displayedResolution}
+            {t("Responded:")}
+            {displayedResolution}
           </ThemedText>
         ) : null}
       </View>
@@ -306,7 +308,7 @@ function FileChangeAccordion({
         return (
           <View key={entry.id} style={styles.fileChangeFileItem}>
             <Pressable
-              accessibilityLabel={`${isExpanded ? "Collapse" : "Expand"} ${entry.path}`}
+              accessibilityLabel={`${isExpanded ? t("Collapse") : t("Expand")} ${entry.path}`}
               accessibilityRole="button"
               accessibilityState={{ expanded: isExpanded }}
               onPress={() => onTogglePath(entry.id)}
@@ -378,7 +380,7 @@ function InlinePatchPreview({ patch }: { patch: string | undefined }) {
   if (!patch) {
     return (
       <ThemedText type="code" themeColor="textSecondary" style={styles.inlinePatchEmpty}>
-        Patch preview unavailable
+        {t("Patch preview unavailable")}
       </ThemedText>
     );
   }
@@ -406,7 +408,7 @@ function InlinePatchPreview({ patch }: { patch: string | undefined }) {
         {preview.truncated ? (
           <View style={styles.inlinePatchLine}>
             <Text selectable style={[styles.inlinePatchText, styles.inlinePatchMuted]}>
-              [... patch preview truncated]
+              {t("[... patch preview truncated]")}
             </Text>
           </View>
         ) : null}
@@ -488,8 +490,8 @@ function ActivityDetailSheet({
     } catch (caught) {
       hapticWarning();
       Alert.alert(
-        "Detail unavailable",
-        caught instanceof Error ? caught.message : "Unable to load the full detail.",
+        t("Detail unavailable"),
+        caught instanceof Error ? caught.message : t("Unable to load the full detail."),
       );
     } finally {
       setLoadingField(undefined);
@@ -524,7 +526,7 @@ function ActivityDetailSheet({
                   </ThemedText>
                   {canLoadFull && section.originalLength ? (
                     <ThemedText type="code" themeColor="textSecondary" style={styles.sectionMeta}>
-                      {section.originalLength} chars
+                      {section.originalLength} {t("chars")}
                     </ThemedText>
                   ) : null}
                 </View>
@@ -536,7 +538,7 @@ function ActivityDetailSheet({
                     section.large && styles.largeSectionBody,
                     section.monospace && {
                       backgroundColor: theme.backgroundSelected,
-                      borderColor: "rgba(255, 255, 255, 0.08)",
+                      borderColor: theme.border,
                     },
                   ]}
                 >
@@ -553,7 +555,7 @@ function ActivityDetailSheet({
                   >
                     {isLoadingFull ? <ActivityIndicator color="#F3F4F6" size="small" /> : null}
                     <Text style={styles.loadFullButtonText}>
-                      {isLoadingFull ? "Loading full detail" : `Load full ${section.field}`}
+                      {isLoadingFull ? t("Loading full detail") : t("Load full {0}", section.field)}
                     </Text>
                   </Button>
                 ) : null}
@@ -587,25 +589,25 @@ function activityModel(message: ChatMessage): ActivityModel {
     case "webSearch":
       return {
         color: "#6FA8DC",
-        label: "Searched",
+        label: t("Searched"),
         detail: stringDetail(message, "query") ?? message.content,
       };
     case "thinking":
       return {
         color: "#9B8BD4",
-        label: "Thinking",
+        label: t("Thinking"),
         detail: firstLine(message.content),
       };
     case "plan":
       return {
         color: "#9B8BD4",
-        label: "Plan",
+        label: t("Plan"),
         detail: firstLine(planBody(message)),
       };
     case "structuredUserInput":
       return {
         color: "#6FA8DC",
-        label: "Input requested",
+        label: t("Input requested"),
         detail: structuredInputDetail(message),
       };
     case "approvalRequest":
@@ -617,14 +619,14 @@ function activityModel(message: ChatMessage): ActivityModel {
     case "subagentAction":
       return {
         color: "#78B88B",
-        label: "Subagents",
+        label: t("Subagents"),
         detail: firstLine(message.content),
       };
     case "toolActivity":
     default:
       return {
         color: "#78B88B",
-        label: "Called",
+        label: t("Called"),
         detail: toolDetail(message),
       };
   }
@@ -638,42 +640,42 @@ function detailSections(message: ChatMessage): DetailSection[] {
       return fileChangeDetailSections(message);
     case "toolActivity":
       return compactSections([
-        detailSection("Server", stringDetail(message, "server")),
-        detailSection("Tool", stringDetail(message, "tool")),
-        detailSection("Status", stringDetail(message, "status")),
-        detailSection("Raw", message.content, true),
+        detailSection(t("Server"), stringDetail(message, "server")),
+        detailSection(t("Tool"), stringDetail(message, "tool")),
+        detailSection(t("Status"), stringDetail(message, "status")),
+        detailSection(t("Raw"), message.content, true),
       ]);
     case "webSearch":
       return compactSections([
-        detailSection("Query", stringDetail(message, "query") ?? message.content),
-        detailSection("Status", stringDetail(message, "status")),
+        detailSection(t("Query"), stringDetail(message, "query") ?? message.content),
+        detailSection(t("Status"), stringDetail(message, "status")),
       ]);
     case "structuredUserInput":
       return compactSections([
-        detailSection("Questions", structuredInputBody(message)),
-        detailSection("Raw", message.content, true),
+        detailSection(t("Questions"), structuredInputBody(message)),
+        detailSection(t("Raw"), message.content, true),
       ]);
     case "approvalRequest":
       return compactSections([
-        detailSection("Request", approvalDetail(message) ?? message.content),
-        detailSection("Reason", stringDetail(message, "reason")),
-        detailSection("Working Directory", stringDetail(message, "cwd")),
-        detailSection("Raw", JSON.stringify(message.details ?? {}, null, 2), true),
+        detailSection(t("Request"), approvalDetail(message) ?? message.content),
+        detailSection(t("Reason"), stringDetail(message, "reason")),
+        detailSection(t("Working Directory"), stringDetail(message, "cwd")),
+        detailSection(t("Raw"), JSON.stringify(message.details ?? {}, null, 2), true),
       ]);
     case "subagentAction":
     case "thinking":
     default:
-      return compactSections([detailSection("Details", message.content || "No details.")]);
+      return compactSections([detailSection(t("Details"), message.content || t("No details."))]);
   }
 }
 
 function commandDetailSections(message: ChatMessage) {
   const command = stringDetail(message, "command") ?? message.content;
   return compactSections([
-    detailSection("Command", command, true),
-    detailSection("Working Directory", stringDetail(message, "cwd")),
-    detailSection("Status", stringDetail(message, "status") ?? exitStatus(message)),
-    lazyDetailSection("Output", stringDetail(message, "output"), "output", message),
+    detailSection(t("Command"), command, true),
+    detailSection(t("Working Directory"), stringDetail(message, "cwd")),
+    detailSection(t("Status"), stringDetail(message, "status") ?? exitStatus(message)),
+    lazyDetailSection(t("Output"), stringDetail(message, "output"), "output", message),
   ]);
 }
 
@@ -683,8 +685,8 @@ function fileChangeDetailSections(message: ChatMessage) {
     .map((change) => `${change.kind.padEnd(8, " ")} ${change.path}`)
     .join("\n");
   return compactSections([
-    detailSection("Files", changeList || message.content, true),
-    lazyDetailSection("Patch", stringDetail(message, "patch"), "patch", message),
+    detailSection(t("Files"), changeList || message.content, true),
+    lazyDetailSection(t("Patch"), stringDetail(message, "patch"), "patch", message),
   ]);
 }
 
@@ -863,9 +865,9 @@ function toolDetail(message: ChatMessage) {
 function fileChangeLabel(message: ChatMessage) {
   const count = fileChangeEntries(message).length;
   if (count === 0) {
-    return "Edited";
+    return t("Edited");
   }
-  return `Edited ${count} file${count === 1 ? "" : "s"}`;
+  return t("Edited {0} file{1}", count, count === 1 ? "" : "s");
 }
 
 function fileChangeDetail(message: ChatMessage) {
@@ -875,7 +877,7 @@ function fileChangeDetail(message: ChatMessage) {
   }
   const paths = entries.map((entry) => compactPath(entry.path));
   const shown = paths.slice(0, 2).join(", ");
-  return paths.length > 2 ? `${shown}, +${paths.length - 2} more` : shown;
+  return paths.length > 2 ? t("{0}, +{1} more", shown, paths.length - 2) : shown;
 }
 
 function fileChanges(message: ChatMessage) {
@@ -1313,7 +1315,9 @@ function meaningfulPlanText(value: string | undefined) {
 function structuredInputDetail(message: ChatMessage) {
   const questions = structuredInputQuestionLines(message);
   if (questions.length > 0) {
-    return questions.length > 1 ? `${questions.length} questions to answer` : "Reply to continue";
+    return questions.length > 1
+      ? t("{0} questions to answer", questions.length)
+      : t("Reply to continue");
   }
   return firstLine(message.content);
 }
@@ -1362,7 +1366,7 @@ function structuredInputQuestionLines(message: ChatMessage) {
         })
       : [];
     const prompt = [header, text].filter(Boolean).join(": ");
-    const optionText = options.length > 0 ? `Options: ${options.join(", ")}` : undefined;
+    const optionText = options.length > 0 ? t("Options: {0}", options.join(", ")) : undefined;
     return [prompt, optionText].filter(Boolean).join("\n");
   });
 }
@@ -1370,17 +1374,17 @@ function structuredInputQuestionLines(message: ChatMessage) {
 function approvalLabel(message: ChatMessage) {
   switch (stringDetail(message, "approvalKind")) {
     case "commandExecution":
-      return "Approve command";
+      return t("Approve command");
     case "fileChange":
-      return "Approve files";
+      return t("Approve files");
     case "permissions":
-      return "Approve permissions";
+      return t("Approve permissions");
     case "structuredUserInput":
-      return "Input requested";
+      return t("Input requested");
     case "mcpElicitation":
-      return "Approve input";
+      return t("Approve input");
     default:
-      return "Approval requested";
+      return t("Approval requested");
   }
 }
 
@@ -1414,16 +1418,16 @@ function humanizeCommand(raw: string) {
     case "nl":
     case "sed":
     case "tail":
-      return { detail: lastPath(args, "file"), label: "Read" };
+      return { detail: lastPath(args, "file"), label: t("Read") };
     case "rg":
     case "grep":
-      return { detail: searchTarget(args), label: "Searched" };
+      return { detail: searchTarget(args), label: t("Searched") };
     case "ls":
-      return { detail: lastPath(args, "directory"), label: "Listed" };
+      return { detail: lastPath(args, "directory"), label: t("Listed") };
     case "git":
       return { detail: args || "repository", label: "Git" };
     default:
-      return { detail: command, label: "Ran" };
+      return { detail: command, label: t("Ran") };
   }
 }
 
@@ -1467,7 +1471,7 @@ function firstLine(value: string) {
   return value.replace(/\s+/g, " ").trim();
 }
 
-const styles = StyleSheet.create({
+const styles = StyleSheet.create((theme) => ({
   actionWrap: {
     alignSelf: "stretch",
     gap: Spacing.two,
@@ -1534,8 +1538,8 @@ const styles = StyleSheet.create({
   },
   answerInput: {
     alignSelf: "stretch",
-    backgroundColor: "rgba(255, 255, 255, 0.06)",
-    borderColor: "rgba(255, 255, 255, 0.10)",
+    backgroundColor: theme.subtle,
+    borderColor: theme.border,
     borderRadius: 8,
     borderWidth: 1,
     color: "#F3F4F6",
@@ -1561,8 +1565,8 @@ const styles = StyleSheet.create({
   row: {
     alignItems: "center",
     alignSelf: "flex-start",
-    backgroundColor: "rgba(255, 255, 255, 0.045)",
-    borderColor: "rgba(255, 255, 255, 0.06)",
+    backgroundColor: theme.subtle,
+    borderColor: theme.border,
     borderRadius: 9,
     borderWidth: StyleSheet.hairlineWidth,
     flexDirection: "row",
@@ -1636,11 +1640,11 @@ const styles = StyleSheet.create({
     color: "#FF7B72",
   },
   fileChangeAccordion: {
-    borderTopColor: "rgba(255, 255, 255, 0.08)",
+    borderTopColor: theme.border,
     borderTopWidth: StyleSheet.hairlineWidth,
   },
   fileChangeFileItem: {
-    borderTopColor: "rgba(255, 255, 255, 0.06)",
+    borderTopColor: theme.border,
     borderTopWidth: StyleSheet.hairlineWidth,
   },
   fileChangeFileRow: {
@@ -1653,7 +1657,7 @@ const styles = StyleSheet.create({
     paddingVertical: 6,
   },
   fileChangeFileRowPressed: {
-    backgroundColor: "rgba(255, 255, 255, 0.055)",
+    backgroundColor: theme.subtle,
   },
   fileChangeKind: {
     color: "#8B98AA",
@@ -1663,7 +1667,7 @@ const styles = StyleSheet.create({
     width: 14,
   },
   fileChangePath: {
-    color: "#D7E0EA",
+    color: theme.text,
     flex: 1,
     flexShrink: 1,
     fontSize: 12,
@@ -1676,7 +1680,7 @@ const styles = StyleSheet.create({
   },
   inlinePatchScroller: {
     backgroundColor: "rgba(5, 8, 13, 0.74)",
-    borderTopColor: "rgba(255, 255, 255, 0.07)",
+    borderTopColor: theme.border,
     borderTopWidth: StyleSheet.hairlineWidth,
   },
   inlinePatchLines: {
@@ -1685,7 +1689,7 @@ const styles = StyleSheet.create({
   },
   inlinePatchEmpty: {
     backgroundColor: "rgba(5, 8, 13, 0.52)",
-    borderTopColor: "rgba(255, 255, 255, 0.07)",
+    borderTopColor: theme.border,
     borderTopWidth: StyleSheet.hairlineWidth,
     fontSize: 11,
     lineHeight: 15,
@@ -1705,7 +1709,7 @@ const styles = StyleSheet.create({
     backgroundColor: "rgba(248, 81, 73, 0.15)",
   },
   inlinePatchLineHunk: {
-    backgroundColor: "rgba(255, 255, 255, 0.075)",
+    backgroundColor: theme.subtle,
   },
   inlinePatchText: {
     flexShrink: 0,
@@ -1722,7 +1726,7 @@ const styles = StyleSheet.create({
     color: "#FFB3B3",
   },
   inlinePatchTextHunk: {
-    color: "#D7E0EA",
+    color: theme.text,
   },
   inlinePatchTextContext: {
     color: "#B9C0CA",
@@ -1811,4 +1815,4 @@ const styles = StyleSheet.create({
     fontWeight: "700",
     lineHeight: 16,
   },
-});
+}));

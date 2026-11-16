@@ -1,3 +1,4 @@
+import { t } from "../i18n";
 import "react-native-get-random-values";
 
 import { gcm } from "@noble/ciphers/aes.js";
@@ -60,7 +61,7 @@ export function attachApprovalCode(attempt: SecurePairingAttempt, approvalCode: 
 
 export function completeSecurePairing(attempt: SecurePairingAttempt, response: PairResponse) {
   if (!response.secure) {
-    throw new Error("Server did not return a secure pairing response.");
+    throw new Error(t("Server did not return a secure pairing response."));
   }
 
   const transcript = pairingTranscript({
@@ -80,7 +81,7 @@ export function completeSecurePairing(attempt: SecurePairingAttempt, response: P
       base64ToBytes(attempt.serverPublicKey),
     )
   ) {
-    throw new Error("Server secure pairing signature did not match the scanned QR.");
+    throw new Error(t("Server secure pairing signature did not match the scanned QR."));
   }
 
   const sharedSecret = x25519.getSharedSecret(
@@ -128,7 +129,7 @@ export function decryptResponsePayload(payload: unknown) {
     envelope.data.keyEpoch !== session.keyEpoch ||
     envelope.data.counter <= session.lastServerCounter
   ) {
-    throw new Error("Server returned an invalid encrypted payload.");
+    throw new Error(t("Server returned an invalid encrypted payload."));
   }
 
   const decrypted = decryptWithKey(

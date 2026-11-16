@@ -28,7 +28,7 @@ describe("mobile Codex Relay API session storage", () => {
     expect(getCodexRelayServerUrl()).toBe(fallbackCodexRelayServerUrl);
     expect(getCodexRelayServerUrlCandidates()).toEqual([
       {
-        label: "Localhost",
+        label: "本机",
         url: fallbackCodexRelayServerUrl,
       },
     ]);
@@ -46,6 +46,6 @@ describe("mobile Codex Relay API session storage", () => {
 
     await vi.advanceTimersByTimeAsync(25);
 
-    await expect(caught).resolves.toMatchObject({ message: "Request timed out." });
+    await expect(caught).resolves.toMatchObject({ message: "请求超时。" });
   });
 });

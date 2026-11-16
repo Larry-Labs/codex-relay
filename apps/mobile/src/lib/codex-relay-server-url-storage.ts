@@ -1,3 +1,4 @@
+import { t } from "../i18n";
 import { createMMKV } from "react-native-mmkv";
 
 const defaultServerUrl = "http://localhost:8787";
@@ -43,12 +44,12 @@ export function saveCodexRelayServerUrlCandidates(urls: string[]) {
 export function normalizeServerUrl(url: string) {
   const trimmed = url.trim().replace(/\/$/, "");
   if (!trimmed) {
-    throw new Error("Server URL is empty.");
+    throw new Error(t("Server URL is empty."));
   }
 
   const parsed = new URL(trimmed);
   if (parsed.protocol !== "http:" && parsed.protocol !== "https:") {
-    throw new Error("Server URL must start with http:// or https://.");
+    throw new Error(t("Server URL must start with http:// or https://."));
   }
 
   return parsed.toString().replace(/\/$/, "");
@@ -119,22 +120,22 @@ function serverUrlCandidateLabel(url: string) {
     const parsed = new URL(url);
     const host = parsed.hostname.toLowerCase();
     if (host === "localhost" || host === "127.0.0.1" || host === "::1") {
-      return "Localhost";
+      return t("Localhost");
     }
     if (host.endsWith(".local")) {
-      return "Local network";
+      return t("Local network");
     }
     if (host.endsWith(".ts.net") || host.endsWith(".beta.tailscale.net")) {
-      return "Tailscale DNS";
+      return t("Tailscale DNS");
     }
     if (isCarrierGradePrivateIPv4Host(host)) {
-      return "Tailscale IP";
+      return t("Tailscale IP");
     }
     if (isPrivateIPv4Host(host) || isLocalIPv6Host(host)) {
-      return "LAN IP";
+      return t("LAN IP");
     }
-    return "Server";
+    return t("Server");
   } catch {
-    return "Server";
+    return t("Server");
   }
 }

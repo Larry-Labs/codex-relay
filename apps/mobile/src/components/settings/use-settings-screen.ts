@@ -1,3 +1,4 @@
+import { t } from "../../i18n";
 import { useSelector } from "@legendapp/state/react";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import Constants from "expo-constants";
@@ -73,7 +74,7 @@ export function useSettingsScreen() {
   const machineName = statusQuery.data?.machineName;
   const computerName = hasPairedSession
     ? (machineName ?? connectedComputerName(serverUrl))
-    : "No paired computer";
+    : t("No paired computer");
   const [appVersion] = useState(
     () => hotUpdater?.getAppVersion() ?? Constants.expoConfig?.version ?? "1.0.0",
   );
@@ -105,10 +106,10 @@ export function useSettingsScreen() {
     appUpdate.status === "downloading" || appUpdate.status === "updating";
   const appUpdateActionLabel =
     appUpdate.status === "downloading"
-      ? "Downloading"
+      ? t("Downloading")
       : appUpdate.status === "updating"
-        ? "Restarting"
-        : "Restart";
+        ? t("Restarting")
+        : t("Restart");
 
   useEffect(() => {
     let isActive = true;
@@ -254,7 +255,7 @@ export function useSettingsScreen() {
     } catch (caught) {
       setPushNotificationPreferences(previousPreferences);
       hapticWarning();
-      Alert.alert("Notifications unavailable", settingsErrorMessage(caught));
+      Alert.alert(t("Notifications unavailable"), settingsErrorMessage(caught));
     } finally {
       setPushNotificationsUpdating(false);
     }
@@ -284,7 +285,7 @@ export function useSettingsScreen() {
     } catch (caught) {
       const message = settingsErrorMessage(caught);
       setConnection("offline", message);
-      Alert.alert("Server unavailable", message);
+      Alert.alert(t("Server unavailable"), message);
     } finally {
       setSwitchingServerUrl(undefined);
     }
@@ -397,17 +398,17 @@ export function useRemoteConfigPanel(remoteConfig: HotUpdaterRemoteConfig) {
 }
 
 export function compactServer(serverUrl: string) {
-  return serverUrl ? serverUrl.replace(/^https?:\/\//, "") : "Not paired";
+  return serverUrl ? serverUrl.replace(/^https?:\/\//, "") : t("Not paired");
 }
 
 export function connectionLabel(connection: SettingsConnection) {
   switch (connection) {
     case "connected":
-      return "ONLINE";
+      return "已连接";
     case "checking":
-      return "CHECKING";
+      return "检查中";
     case "offline":
-      return "OFFLINE";
+      return "未连接";
   }
 }
 
@@ -428,15 +429,15 @@ export function rateLimitProgressColor(remainingPercent: number) {
 export function appUpdateStatusSuffix(status: AppUpdateState["status"]) {
   switch (status) {
     case "checking":
-      return "checking";
+      return "正在检查更新";
     case "current":
-      return "current";
+      return "当前版本";
     case "downloading":
-      return "downloading";
+      return "正在下载";
     case "ready":
-      return "restart ready";
+      return "重启后生效";
     case "error":
-      return "check failed";
+      return "检查更新失败";
     case "updating":
       return undefined;
   }
@@ -444,7 +445,7 @@ export function appUpdateStatusSuffix(status: AppUpdateState["status"]) {
 
 function connectedComputerName(serverUrl: string) {
   if (!serverUrl) {
-    return "No computer paired";
+    return t("No computer paired");
   }
   try {
     return new URL(serverUrl).hostname;
@@ -457,7 +458,7 @@ function settingsErrorMessage(error: unknown) {
   if (error instanceof Error && error.message) {
     return error.message;
   }
-  return "Could not reach the selected server address.";
+  return t("Could not reach the selected server address.");
 }
 
 function appliedHotUpdateBundleSuffix() {

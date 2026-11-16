@@ -1,3 +1,4 @@
+import { t } from "../i18n";
 import Constants from "expo-constants";
 import * as Notifications from "expo-notifications";
 import type { PushNotificationPreferences } from "codex-relay/api-schema";
@@ -18,7 +19,7 @@ let foregroundNotificationHandlerConfigured = false;
 
 export class PushNotificationPermissionDeniedError extends Error {
   constructor() {
-    super("Notifications are not allowed for Codex Relay.");
+    super(t("Notifications are not allowed for Codex Relay."));
     this.name = "PushNotificationPermissionDeniedError";
   }
 }
@@ -62,7 +63,7 @@ export async function getExpoPushToken() {
 
   const projectId = expoProjectId();
   if (!projectId) {
-    throw new Error("This app build is missing its Expo project identifier.");
+    throw new Error(t("This app build is missing its Expo project identifier."));
   }
   return (await Notifications.getExpoPushTokenAsync({ projectId })).data;
 }
@@ -85,7 +86,7 @@ export function pushNotificationPlatform(): "android" | "ios" {
   if (Platform.OS === "android" || Platform.OS === "ios") {
     return Platform.OS;
   }
-  throw new Error("Push notifications are available only in the iOS and Android apps.");
+  throw new Error(t("Push notifications are available only in the iOS and Android apps."));
 }
 
 function expoProjectId() {

@@ -6610,8 +6610,11 @@ function resolveRuntimeOptions(
 function resolveAppServerRuntime(options: RuntimeOptionSubset | undefined, workspacePath: string) {
   const runtime = resolveRuntimeOptions(options?.runtimeMode) ?? {};
   const sandbox = options?.sandboxMode ?? runtime.sandboxMode ?? "workspace-write";
+  const approvalPolicy = options?.approvalPolicy ?? runtime.approvalPolicy ?? "on-request";
   return {
-    approvalPolicy: options?.approvalPolicy ?? runtime.approvalPolicy ?? "on-request",
+    // Current app-server versions removed on-failure; normalize legacy auto mode
+    // and saved overrides while retaining approval before sandbox escalation.
+    approvalPolicy: approvalPolicy === "on-failure" ? "on-request" : approvalPolicy,
     sandbox,
     sandboxPolicy: sandboxPolicyForMode(sandbox, workspacePath),
   };
