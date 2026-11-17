@@ -1,4 +1,5 @@
 import { t } from "../i18n";
+import { appName } from "../constants/brand";
 import Constants from "expo-constants";
 import * as Notifications from "expo-notifications";
 import type { PushNotificationPreferences } from "codex-relay/api-schema";
@@ -48,7 +49,7 @@ export async function getExpoPushToken() {
   if (platform === "android") {
     await Notifications.setNotificationChannelAsync("default", {
       importance: Notifications.AndroidImportance.DEFAULT,
-      name: "Codex Relay",
+      name: appName,
     });
   }
 

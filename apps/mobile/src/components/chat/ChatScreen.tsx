@@ -1,4 +1,5 @@
 import { t } from "../../i18n";
+import { appChineseName, appName } from "@/constants/brand";
 import { useSelector } from "@legendapp/state/react";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import type {
@@ -2318,9 +2319,9 @@ export function ChatScreen({ initialPairingUrl, onPairingComplete }: ChatScreenP
       rateLimitBuckets={rateLimitBuckets}
       skills={skills}
       skillsLoadState={skillsLoadState}
-      subtitle={activeWorkspacePath ?? "codex-relay"}
+      subtitle={activeWorkspacePath ?? appChineseName}
       threadId={activeThreadId}
-      title={activeThread?.title ?? "Codex Relay"}
+      title={activeThread?.title ?? appName}
       trailingActions={chatTrailingActions}
       workspacePath={activeWorkspacePath}
     />

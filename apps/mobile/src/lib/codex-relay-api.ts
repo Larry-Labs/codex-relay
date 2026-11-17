@@ -1,4 +1,5 @@
 import { t } from "../i18n";
+import { appName } from "../constants/brand";
 import "react-native-get-random-values";
 
 import { errorMessage } from "./api-error-message";
@@ -290,7 +291,7 @@ async function pairWithApproval(
     },
     body: JSON.stringify({
       clientSessionId: getClientSessionId(),
-      clientName: "Codex Relay mobile",
+      clientName: appName,
       secure: {
         clientEphemeralPublicKey: securePairing.clientEphemeralPublicKey,
         clientNonce: securePairing.clientNonce,

@@ -1,6 +1,6 @@
-# iPhone 中文客户端
+# Palm Agents · 掌上 Agents
 
-开发分支：`dev/codex-pocket`。基于 Codex Relay 1.6.3 客户端，保留上游许可证及作者署名。
+仓库：[Larry-Labs/palm-agents](https://github.com/Larry-Labs/palm-agents)。开发分支：`dev/palm-agents`。基于 Codex Relay 1.6.3 客户端，保留上游许可证及作者署名。
 
 ## 本轮实现
 
@@ -36,7 +36,7 @@
 
 ## 构建与验证
 
-应用名称暂定为「Codex Relay 中文版」，Bundle ID 为 `com.larrylabs.codexrelay.cn`，URL scheme 为 `codex-relay-cn`。应用内扫码仍兼容上游 Relay 生成的配对二维码。独立的 Bundle ID 可与上游应用并存。
+英文名为 **Palm Agents**，中文名为「掌上 Agents」。桌面显示名称为 Palm Agents，Bundle ID 为 `com.larrylabs.palmagents`，URL scheme 为 `palm-agents`。应用内扫码仍兼容上游 Relay 生成的配对二维码。独立的 Bundle ID 可与上游应用并存。
 
 在 macOS 安装依赖并运行原生开发客户端：
 
@@ -47,7 +47,7 @@ pnpm dev:mobile:ios
 
 配对本机或其他电脑时，在客户端内扫描该电脑 Relay 的二维码。不要将配对凭据提交到仓库。
 
-使用 EAS 构建或推送通知前，先关联自己的 Expo 项目并设置 `EAS_PROJECT_ID`；没有沿用上游项目 ID。OTA 默认关闭；独立配置 `EXPO_PUBLIC_HOT_UPDATER_BASE_URL` 和 `HOT_UPDATER_PUBLIC_KEY_PATH` 后才启用相应原生构建插件。
+使用 EAS 构建或推送通知前，先关联自己的 Expo 项目并设置 `EAS_PROJECT_ID`；没有沿用上游项目 ID。提交 App Store 前需选择自己的 App Store Connect 应用；EAS 配置没有预填上游商店应用 ID。OTA 默认关闭；独立配置 `EXPO_PUBLIC_HOT_UPDATER_BASE_URL` 和 `HOT_UPDATER_PUBLIC_KEY_PATH` 后才启用相应原生构建插件。
 
 当前工作环境是 Linux，不能运行 iOS 模拟器或生成签名后的 iPhone 安装包。上游依赖的 Markdown 输入框与原生网络模块缺少完整 Web 实现，浏览器不能替代原生客户端验收。
 

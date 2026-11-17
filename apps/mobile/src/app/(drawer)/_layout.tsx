@@ -6,6 +6,7 @@ import { SafeAreaView, useSafeAreaInsets } from "react-native-safe-area-context"
 import { StyleSheet } from "react-native-unistyles";
 
 import { ThreadDrawerContent } from "@/components/chat/ThreadDrawerContent";
+import { appName } from "@/constants/brand";
 import {
   EXPANDED_DRAWER_BREAKPOINT,
   IpadSplitLayoutProvider,
@@ -81,7 +82,7 @@ function DrawerLayoutContent() {
         name="index"
         options={{
           drawerLabel: t("Threads"),
-          title: "Codex Relay",
+          title: appName,
         }}
       />
       {__DEV__ ? (

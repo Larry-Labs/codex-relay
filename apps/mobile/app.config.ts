@@ -1,5 +1,6 @@
 import type { ConfigContext, ExpoConfig } from "expo/config";
 import { config } from "dotenv";
+import brand from "./brand.json";
 
 config({ path: ".env.local", quiet: true });
 
@@ -13,16 +14,16 @@ const hotUpdaterEnabled = Boolean(
 
 export default function appConfig(_context: ConfigContext): ExpoConfig {
   return {
-    name: "Codex Relay 中文版",
-    slug: "codex-relay-cn",
+    name: brand.name,
+    slug: brand.slug,
     version: "1.6.3",
     orientation: "default",
     icon: "./assets/images/icon.png",
-    scheme: "codex-relay-cn",
+    scheme: brand.scheme,
     userInterfaceStyle: "automatic",
     ios: {
       icon: "./assets/images/icon.png",
-      bundleIdentifier: "com.larrylabs.codexrelay.cn",
+      bundleIdentifier: brand.identifier,
       deploymentTarget: "16.4",
       supportsTablet: true,
       infoPlist: {
@@ -47,7 +48,7 @@ export default function appConfig(_context: ConfigContext): ExpoConfig {
         monochromeImage: "./assets/images/android-icon-monochrome.png",
       },
       predictiveBackGestureEnabled: false,
-      package: "com.larrylabs.codexrelay.cn",
+      package: brand.identifier,
       permissions: ["android.permission.CAMERA", "android.permission.POST_NOTIFICATIONS"],
     },
     web: {

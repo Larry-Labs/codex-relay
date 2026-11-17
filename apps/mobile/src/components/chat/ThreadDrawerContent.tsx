@@ -28,6 +28,7 @@ import {
 import { Button } from "@/components/ui/button";
 import { Icon } from "@/components/ui/icon";
 import { Text } from "@/components/ui/text";
+import { appName } from "@/constants/brand";
 import { codexRelayRepositoryUrl } from "@/constants/links";
 import { Fonts } from "@/constants/theme";
 import { useTheme } from "@/hooks/use-theme";
@@ -1131,7 +1132,7 @@ function DrawerListHeader({
   return (
     <View style={styles.header}>
       <View style={styles.brandRow}>
-        <Text style={styles.brandText}>Codex Relay</Text>
+        <Text style={styles.brandText}>{appName}</Text>
         {showCloseButton ? (
           <Button
             accessibilityLabel={t("Close menu")}
