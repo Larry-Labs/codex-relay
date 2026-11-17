@@ -1,6 +1,6 @@
 # iPhone 中文客户端
 
-开发分支：`dev/iphone-app`。基于 Codex Relay 1.6.3 客户端，保留上游许可证及作者署名。
+开发分支：`dev/codex-pocket`。基于 Codex Relay 1.6.3 客户端，保留上游许可证及作者署名。
 
 ## 本轮实现
 
